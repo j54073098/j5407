@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #0a0a0a;
+            color: #00ff00;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .input-field {
+            border: 2px solid #00ff00;
+            background-color: transparent;
+            color: #00ff00;
+            padding: 0.5rem;
+            border-radius: 0.375rem;
+            transition: all 0.3s ease;
+        }
+        .input-field:focus {
+            outline: none;
+            border-color: #00cc00;
+            box-shadow: 0 0 5px #00ff00, 0 0 10px #00ff00;
+        }
+        .button {
+            background-color: transparent;
+            border: 2px solid #00ff00;
+            color: #00ff00;
+            padding: 0.5rem;
+            border-radius: 0.375rem;
+            transition: all 0.3s ease;
+        }
+        .button:hover {
+            background-color: #00ff00;
+            color: #0a0a0a;
+            box-shadow: 0 0 5px #00ff00, 0 0 10px #00ff00;
+        }
+        .neon {
+            text-shadow: 0 0 5px #00ff00, 0 0 10px #00ff00, 0 0 15px #00ff00;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen">
+    <div class="bg-gray-900 p-8 rounded-lg shadow-lg w-96">
+        <h2 class="text-3xl font-bold text-center mb-6 neon">Login</h2>
+        <form id="loginForm" onsubmit="return validateLogin()">
+            <div class="mb-4">
+                <input type="password" id="loginKey" placeholder="LOGIN KEY" class="input-field w-full" required>
+            </div>
+            <button type="submit" class="button w-full">Login</button>
+            <p id="errorMessage" class="text-red-500 mt-4 hidden">Incorrect LOGIN KEY. Please try again.</p>
+            <p id="contactMessage" class="text-red-500 mt-4 hidden">Exceeded maximum attempts. Contact your hacker.</p>
+        </form>
+    </div>
+
+    <script>
+        const correctLoginKey = "()@#$&UJASIODFJ";
+        let loginAttempts = 0;
+        const maxAttempts = 5;
+
+        function validateLogin() {
+            const loginKey = document.getElementById("loginKey").value;
+            const errorMessage = document.getElementById("errorMessage");
+            const contactMessage = document.getElementById("contactMessage");
+
+            if (loginKey === 
+                correctLoginKey) {
+                // Redirect to the dashboard or next page
+                window.location.href = "dashboard.html";
+                return false;
+            } else {
+                loginAttempts++;
+                errorMessage.classList.remove("hidden");
+
+                if (loginAttempts >= maxAttempts) {
+                    errorMessage.classList.add("hidden");
+                    contactMessage.classList.remove("hidden");
+                }
+
+                return false;
+            }
+        }
+    </script>
+</body>
+</html>
