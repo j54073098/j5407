@@ -10,6 +10,7 @@
             background-color: #0a0a0a;
             color: #00ff00;
             font-family: 'Courier New', Courier, monospace;
+            user-select: none;
         }
         .input-field {
             border: 2px solid #00ff00;
@@ -68,9 +69,7 @@
             const errorMessage = document.getElementById("errorMessage");
             const contactMessage = document.getElementById("contactMessage");
 
-            if (loginKey === 
-                correctLoginKey) {
-                // Redirect to the dashboard or next page
+            if (loginKey === correctLoginKey) {
                 window.location.href = "dashboard.html";
                 return false;
             } else {
@@ -85,6 +84,13 @@
                 return false;
             }
         }
+
+        document.addEventListener('contextmenu', event => event.preventDefault());
+        document.addEventListener('keydown', function(event) {
+            if (event.ctrlKey && (event.key === 'u' || event.key === 'U' || event.key === 's' || event.key === 'S' || event.key === 'c' || event.key === 'C' || event.shiftKey && event.key === 'I')) {
+                event.preventDefault();
+            }
+        });
     </script>
 </body>
 </html>
