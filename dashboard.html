@@ -10,6 +10,7 @@
             background-color: #0a0a0a;
             color: #00ff00;
             font-family: 'Courier New', Courier, monospace;
+            user-select: none;
         }
         .api-key {
             display: inline-block;
@@ -17,18 +18,18 @@
             padding: 0.5rem;
             border-radius: 0.375rem;
             transition: all 0.3s ease;
-            word-break: break-all; /* Ensure long text breaks to new lines */
+            word-break: break-all;
         }
-        .copy-button, .logout-button {
+        .copy-button, .logout-button, .target-button {
             background-color: transparent;
             border: 2px solid #00ff00;
             color: #00ff00;
             padding: 0.5rem;
             border-radius: 0.375rem;
             transition: all 0.3s ease;
-            margin-top: 0.5rem; /* Add some space between elements */
+            margin-top: 0.5rem;
         }
-        .copy-button:hover, .logout-button:hover {
+        .copy-button:hover, .logout-button:hover, .target-button:hover {
             background-color: #00ff00;
             color: #0a0a0a;
         }
@@ -45,42 +46,41 @@
         }
         .title {
             display: inline-block;
-            margin-top: 0.5rem; /* Space between name and title */
+            margin-top: 0.5rem;
         }
         .name::after {
             content: '';
             position: absolute;
             left: 0;
             right: 0;
-            bottom: -2px; /* Adjusts the position of the underline */
-            height: 2px; /* Thickness of the underline */
-            background-color: #00ff00; /* Color of the underline */
+            bottom: -2px;
+            height: 2px;
+            background-color: #00ff00;
             transition: width 0.3s ease;
         }
         .modal {
-            display: none; /* Hidden by default */
-            position: fixed; /* Stay in place */
-            z-index: 1; /* Sit on top */
+            display: none;
+            position: fixed;
+            z-index: 1;
             left: 0;
             top: 0;
-            width: 100%; /* Full width */
-            height: 100%; /* Full height */
-            overflow: auto; /* Enable scroll if needed */
-            background-color: rgb(0,0,0); /* Fallback color */
-            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
         }
         .modal-content {
             background-color: #0a0a0a;
-            margin: 15% auto; /* 15% from the top and centered */
+            margin: 15% auto;
             padding: 20px;
             border: 2px solid #00ff00;
             width: 80%;
-            max-width: 400px; /* Could be more or less, depending on screen size */
+            max-width: 400px;
             border-radius: 0.375rem;
             color: #00ff00;
             text-align: center;
         }
-        .close, .confirm-logout {
+        .close, .confirm-logout, .confirm-payment {
             background-color: transparent;
             border: 2px solid #00ff00;
             color: #00ff00;
@@ -89,7 +89,7 @@
             transition: all 0.3s ease;
             cursor: pointer;
         }
-        .close:hover, .confirm-logout:hover {
+        .close:hover, .confirm-logout:hover, .confirm-payment:hover {
             background-color: #00ff00;
             color: #0a0a0a;
         }
@@ -104,7 +104,10 @@
         
         <div class="mb-4">
             <p class="text-lg">Account Type: <span class="font-semibold">Facebook</span></p>
-            <p class="text-lg">Account Name: <span class="font-semibold">Rene Bandoquillo</span></p>
+            <div class="flex items-center">
+                <p class="text-lg">Account Name: <span class="font-semibold">Rene Bandoquillo</span></p>
+                <button class="target-button ml-4" onclick="window.location.href='https://www.facebook.com/100005629605280'">Target</button>
+            </div>
             <p class="text-lg">Account Password: <span id="apiKey" class="api-key"></span></p>
             <button class="copy-button" onclick="copyApiKey()">Copy API Key</button>
             <p class="text-lg">Account Status: <span class="font-semibold text-red-500">Risk</span></p>
@@ -112,7 +115,7 @@
         </div>
 
         <div class="mb-4">
-            <button class="copy-button" onclick="payHere()">$6.99 FOR FASTER CODE</button>
+            <button class="copy-button" onclick="openPaymentModal()">$6.99 FOR FASTER CODE</button>
         </div>
 
         <div class="recommendation">
@@ -121,7 +124,6 @@
             <span class="title">Hacker at META</span></p>
         </div>
 
-        <!-- Binded Notifications Section -->
         <div class="mt-6 bg-gray-800 p-4 rounded-lg">
             <h3 class="text-2xl font-bold mb-4">Binded Notifications:</h3>
             <p class="text-lg">Email: <span class="font-semibold">bandoquillojocelyn963@gmail.com</span></p>
@@ -129,7 +131,6 @@
         </div>
     </div>
 
-    <!-- The Modal -->
     <div id="logoutModal" class="modal">
         <div class="modal-content">
             <p>Are you sure you want to logout?</p>
@@ -138,14 +139,29 @@
         </div>
     </div>
 
+    <div id="paymentModal" class="modal">
+        <div class="modal-content">
+            <p>Proceed with the payment of $6.99 for faster code?</p>
+            <button class="close" onclick="closePaymentModal()">Cancel</button>
+            <button class="confirm-payment" onclick="confirmPayment()">Pay</button>
+        </div>
+    </div>
+
+    <div id="paymentDeclinedModal" class="modal">
+        <div class="modal-content">
+            <p>DECLINED! Full user paying. Try again later.</p>
+            <button class="close" onclick="closePaymentDeclinedModal()">Close</button>
+        </div>
+    </div>
+
     <script>
         const apiKey = "1234abcd5678efghijklmnopqrstuvwx1234567890abcdef1234567890abcdef12";
-        const visiblePart = apiKey.slice(0, 36); // First part remains visible
-        const hiddenPart = apiKey.slice(36); // The part that will be revealed character by character
-        let revealedCharacters = 0; // Number of characters revealed
-        const totalCharacters = hiddenPart.length; // Total characters to reveal
-        const totalAsterisks = totalCharacters; // Total asterisks to initially display
-        let countdown = 1000; // 1000 seconds countdown
+        const visiblePart = apiKey.slice(0, 36);
+        const hiddenPart = apiKey.slice(36);
+        let revealedCharacters = 0;
+        const totalCharacters = hiddenPart.length;
+        const totalAsterisks = totalCharacters;
+        let countdown = 1000;
         const countdownElement = document.getElementById("countdown");
 
         function copyApiKey() {
@@ -155,8 +171,21 @@
             });
         }
 
-        function payHere() {
-            alert("DECLINED! Full user paying. Try again later");
+        function openPaymentModal() {
+            document.getElementById('paymentModal').style.display = 'block';
+        }
+
+        function closePaymentModal() {
+            document.getElementById('paymentModal').style.display = 'none';
+        }
+
+        function confirmPayment() {
+            closePaymentModal();
+            document.getElementById('paymentDeclinedModal').style.display = 'block';
+        }
+
+        function closePaymentDeclinedModal() {
+            document.getElementById('paymentDeclinedModal').style.display = 'none';
         }
 
         function openLogoutModal() {
@@ -168,8 +197,8 @@
         }
 
         function confirmLogout() {
-            saveState(); // Save state before logging out
-            window.location.href = "index.html"; // Redirect to login page
+            saveState();
+            window.location.href = "index.html";
         }
 
         function saveState() {
@@ -185,12 +214,11 @@
 
         function updateApiKeyDisplay() {
             const apiKeyElement = document.getElementById("apiKey");
-            const hiddenPartRevealed = hiddenPart.slice(0, revealedCharacters); // Reveal the saved number of characters
-            const remainingAsterisks = '*'.repeat(totalAsterisks - revealedCharacters); // Remaining asterisks
-            apiKeyElement.innerText = visiblePart + hiddenPartRevealed + remainingAsterisks; // Update displayed API key
+            const hiddenPartRevealed = hiddenPart.slice(0, revealedCharacters);
+            const remainingAsterisks = '*'.repeat(totalAsterisks - revealedCharacters);
+            apiKeyElement.innerText = visiblePart + hiddenPartRevealed + remainingAsterisks;
         }
 
-        // Function to reveal the hidden part of the API key every minute
         function updateCountdown() {
             if (countdown > 0) {
                 countdownElement.innerText = `Next reveal in: ${countdown} seconds`;
@@ -198,8 +226,8 @@
             } else {
                 if (revealedCharacters < totalCharacters) {
                     revealedCharacters++;
-                    updateApiKeyDisplay(); // Update the displayed API key
-                    countdown = 1000; // Reset countdown
+                    updateApiKeyDisplay();
+                    countdown = 1000;
                 } else {
                     countdownElement.innerText = "All characters revealed!";
                     clearInterval(countdownInterval);
@@ -207,10 +235,17 @@
             }
         }
 
-        // Load state and start countdown on page load
+        document.addEventListener('contextmenu', event => event.preventDefault());
+
+        document.addEventListener('keydown', function(event) {
+            if (event.ctrlKey && (event.key === 'u' || event.key === 'U' || event.key === 's' || event.key === 'S' || event.key === 'c' || event.key === 'C' || event.shiftKey && event.key === 'I')) {
+                event.preventDefault();
+            }
+        });
+
         document.addEventListener("DOMContentLoaded", () => {
             loadState();
-            updateCountdown(); // Initial call to set the countdown text
+            updateCountdown();
             setInterval(updateCountdown, 1000);
         });
     </script>
